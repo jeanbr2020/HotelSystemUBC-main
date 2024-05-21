@@ -1,11 +1,11 @@
-package br.com.brazcubas.hotelSystem;
+package br.com.brazcubas.hotelSystem.config;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
 
 public class DatabaseConfig {
     // using postgreSQL as DB
