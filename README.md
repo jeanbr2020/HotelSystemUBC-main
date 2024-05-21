@@ -33,7 +33,7 @@ privacidade dos hóspedes
 - Spring;
 - PostgreSQL
 
-<div> 
+<div>
   <h1>Tecnologias Utilizadas</h1>
 
 [![My Skills](https://skillicons.dev/icons?i=github,java,maven,spring,postgres,vscode)](https://skillicons.dev)

@@ -1,18 +1,18 @@
 package br.com.brazcubas.hotelSystem.model.dao;
 
 import java.util.List;
-import br.com.brazcubas.hotelSystem.model.entity.AbstractEntity;
+import br.com.brazcubas.hotelSystem.model.entity.Hotel;
 
-public interface IDAO<T extends AbstractEntity> {
-    //>>>> REGISTER CONTROL 
-    void cadastrar(T entidade);
-    void atualizar(T entidade);
+public interface IDAO {
+    //>>>> REGISTER CONTROL
+    void cadastrar(Hotel hotel);
+    void atualizar(Hotel hotel);
     void excluir(int id);
-    T buscar(int id);
-    List<T> listar();
-    //>>>> EMPRESTIMO CONTROL
-    void emprestar(T entidade);
-    void devolver(int id);
-    T buscarEmpr(int id);
-    List<T> listarEmprest();
+    Hotel buscar(int id);
+    List<Hotel> listar();
+    //>>>> RESERVA CONTROL
+    void reservar(Hotel hotel);
+    void cancelarReserva(int id);
+    Hotel buscarReserva(int id);
+    List<Hotel> listarReservas();
 }
