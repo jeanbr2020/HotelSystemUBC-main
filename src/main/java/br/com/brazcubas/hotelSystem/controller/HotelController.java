@@ -8,21 +8,23 @@ import br.com.brazcubas.hotelSystem.model.entity.Hotel;
 public class HotelController {
     private final IDAO<Hotel> hotelDAO;
 
-    //>>>>>> CONSTRUTOR
+    // Construtor
     public HotelController (IDAO<Hotel> hotelDAO) {
       this.hotelDAO = hotelDAO;
     }
 
-    //>>>>>> CONTROLA CADASTRO DE HÓSPEDES
-    public String cadastrarHotel(Hotel hotel) {
+    // Controla cadastro de hóspedes
+    public String cadastrarHotel(String nome, String descricao, double preco) {
+      Hotel hotel = new Hotel(nome, descricao, preco);
       hotelDAO.cadastrar(hotel);
       return "Cadastro realizado!";
     }
 
-    public String atualizarHotel(Hotel hotel) {
+    public String atualizarHotel(int id, String nome, String descricao, double preco) {
+        Hotel hotel = new Hotel(id, nome, descricao, preco);
         hotelDAO.atualizar(hotel);
         return "Atualização realizada!";
-      }
+    }
     
     public String excluirHotel(int id) {
       hotelDAO.excluir(id);
@@ -36,7 +38,7 @@ public class HotelController {
       return hotelDAO.listar();
     }
 
-    //>>>>>> CONTROLA RESERVA DE HOTEL
+    // Controla reserva de hotel
     public Hotel buscarReserva(int id) {
       Hotel hotel = hotelDAO.buscar(id);
       if(hotel.getReservaCliente() != null) {

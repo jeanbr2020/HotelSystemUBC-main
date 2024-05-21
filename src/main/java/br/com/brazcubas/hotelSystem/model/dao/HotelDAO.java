@@ -3,112 +3,79 @@ package br.com.brazcubas.hotelSystem.model.dao;
 import java.util.ArrayList;
 import java.util.List;
 
-import br.com.brazcubas.hotelSystem.config.DatabaseConfig;
 import br.com.brazcubas.hotelSystem.model.entity.Hotel;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.ResultSet;
 
-public class HotelDAO implements IDAO {
+public class HotelDAO implements IDAO<Hotel> {
+    private List<Hotel> hoteis = new ArrayList<>();
 
-    // >>>>> OPERAÇÕES NA TABELA HOTEL
     @Override
     public void cadastrar(Hotel hotel) {
-        String sql = "INSERT INTO hotel (nome, descricao, preco, reservaCliente, reservaDataInicio, reservaDataFim) VALUES (?, ?, ?, ?, ?, ?)";
-
-        try (Connection connection = DatabaseConfig.getConnection();
-            PreparedStatement stmt = connection.prepareStatement(sql)) {
-                stmt.setString(1, hotel.getNome());
-                stmt.setString(2, hotel.getDescricao());
-                stmt.setDouble(3, hotel.getPreco());
-                stmt.setString(4, hotel.getReservaCliente());
-                stmt.setString(5, hotel.getReservaDataInicio());
-                stmt.setString(6, hotel.getReservaDataFim());
-
-                stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        hoteis.add(hotel);
     }
 
     @Override
     public void atualizar(Hotel hotel) {
-        String sql = "UPDATE hotel SET nome = ?, descricao = ?, preco = ?, reservaCliente = ?, reservaDataInicio = ?, reservaDataFim = ? WHERE id = ?";
-
-        try (Connection connection = DatabaseConfig.getConnection();
-            PreparedStatement stmt = connection.prepareStatement(sql)) {
-                stmt.setString(1, hotel.getNome());
-                stmt.setString(2, hotel.getDescricao());
-                stmt.setDouble(3, hotel.getPreco());
-                stmt.setString(4, hotel.getReservaCliente());
-                stmt.setString(5, hotel.getReservaDataInicio());
-                stmt.setString(6, hotel.getReservaDataFim());
-                stmt.setInt(7, hotel.getId());
-
-                stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
+        for (int i = 0; i < hoteis.size(); i++) {
+            if (hoteis.get(i).getId() == hotel.getId()) {
+                hoteis.set(i, hotel);
+                break;
+            }
         }
     }
 
-    // ... Restante do código ...
+    @Override
+    public void excluir(int id) {
+        hoteis.removeIf(hotel -> hotel.getId() == id);
+    }
 
-    // >>>>> OPERAÇÕES NA TABELA RESERVA
+    @Override
+    public Hotel buscar(int id) {
+        for (Hotel hotel : hoteis) {
+            if (hotel.getId() == id) {
+                return hotel;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public List<Hotel> listar() {
+        return hoteis;
+    }
+
+    @Override
+    public void reservar(Hotel hotel) {
+        atualizar(hotel);
+    }
+
+    @Override
+    public void cancelarReserva(int id) {
+        Hotel hotel = buscar(id);
+        if (hotel != null) {
+            hotel.setReservaCliente(null);
+            hotel.setReservaDataInicio(null);
+            hotel.setReservaDataFim(null);
+            atualizar(hotel);
+        }
+    }
+
     @Override
     public Hotel buscarReserva(int id) {
-        String sql = "SELECT * FROM hotel WHERE id = ? AND reservaCliente IS NOT NULL";
-
-        try (Connection connection = DatabaseConfig.getConnection();
-            PreparedStatement stmt = connection.prepareStatement(sql)) {
-                stmt.setInt(1, id);
-
-                ResultSet rs = stmt.executeQuery();
-                if(rs.next()) {
-                    Hotel hotel = new Hotel();
-                    hotel.setId(rs.getInt("id"));
-                    hotel.setNome(rs.getString("nome"));
-                    hotel.setDescricao(rs.getString("descricao"));
-                    hotel.setPreco(rs.getDouble("preco"));
-                    hotel.setReservaCliente(rs.getString("reservaCliente"));
-                    hotel.setReservaDataInicio(rs.getString("reservaDataInicio"));
-                    hotel.setReservaDataFim(rs.getString("reservaDataFim"));
-
-                    return hotel;
-                }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        Hotel hotel = buscar(id);
+        if (hotel != null && hotel.getReservaCliente() != null) {
+            return hotel;
         }
         return null;
     }
 
     @Override
     public List<Hotel> listarReservas() {
-        List<Hotel> hoteis = new ArrayList<Hotel>();
-        String sql = "SELECT * FROM hotel WHERE reservaCliente IS NOT NULL";
-
-        try (Connection connection = DatabaseConfig.getConnection();
-            PreparedStatement stmt = connection.prepareStatement(sql)) {
-
-                ResultSet rs = stmt.executeQuery();
-
-                while(rs.next()) {
-                    Hotel hotel = new Hotel();
-                    hotel.setId(rs.getInt("id"));
-                    hotel.setNome(rs.getString("nome"));
-                    hotel.setDescricao(rs.getString("descricao"));
-                    hotel.setPreco(rs.getDouble("preco"));
-                    hotel.setReservaCliente(rs.getString("reservaCliente"));
-                    hotel.setReservaDataInicio(rs.getString("reservaDataInicio"));
-                    hotel.setReservaDataFim(rs.getString("reservaDataFim"));
-
-                    hoteis.add(hotel);
-                }
-
-                return hoteis;
-        } catch (SQLException e) {
-            e.printStackTrace();
+        List<Hotel> reservas = new ArrayList<>();
+        for (Hotel hotel : hoteis) {
+            if (hotel.getReservaCliente() != null) {
+                reservas.add(hotel);
+            }
         }
-        return null;
+        return reservas;
     }
 }
