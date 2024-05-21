@@ -1,4 +1,4 @@
-package br.com.brazcubas.hotelSystem;.controller;
+package br.com.brazcubas.hotelSystem.controller;
 
 import java.util.List;
 
@@ -6,54 +6,67 @@ import br.com.brazcubas.hotelSystem.model.dao.IDAO;
 import br.com.brazcubas.hotelSystem.model.entity.Hotel;
 
 public class HotelController {
-    private final IDAO<Hotel> HotelDAO;
+    private final IDAO<Hotel> hotelDAO;
 
-    //>>>>>> CONSTRUTOR
-    public HotelController (IDAO<Hotel> HotelDAO) {
-      this.HotelDAO = HotelDAO;
+    // Construtor
+    public HotelController (IDAO<Hotel> hotelDAO) {
+      this.hotelDAO = hotelDAO;
     }
 
-    //>>>>>> CONTROLA CADASTRO LIVRO
-    public String cadastrarHospedes(Hotel livro) {
-      HotelDAO.cadastrar(livro);
+    // Controla cadastro de hóspedes
+    public String cadastrarHotel(String nome, String descricao, double preco) {
+      Hotel hotel = new Hotel(nome, descricao, preco);
+      hotelDAO.cadastrar(hotel);
       return "Cadastro realizado!";
     }
 
-    public String atualizarHospedes(Hotel livro) {
-        HotelDAO.atualizar(livro);
+    public String atualizarHotel(int id, String nome, String descricao, double preco) {
+        Hotel hotel = new Hotel(id, nome, descricao, preco);
+        hotelDAO.atualizar(hotel);
         return "Atualização realizada!";
-      }
+    }
     
-    public String excluirHospedes(int id) {
-      HotelDAO.excluir(id);
+    public String excluirHotel(int id) {
+      hotelDAO.excluir(id);
       return "Exclusão realizada!";
     }
   
-    public Hotel buscarLivro(int id) {
-      return (Hotel) HotelDAO.buscar(id);
+    public Hotel buscarHotel(int id) {
+      return hotelDAO.buscar(id);
     }
-    public List<Hotel> listarHospedes() {
-      return HotelDAO.listar();
-    }
-
-    //>>>>>> CONTROLA EMPRESTIMO LIVRO
-    public Hotel buscarLivroEmpr(int id) {
-      return (Hotel) HotelDAO.buscarEmpr(id);
+    public List<Hotel> listarHoteis() {
+      return hotelDAO.listar();
     }
 
-    public String emprestaLivro(Hotel livro) {
-      HotelDAO.emprestar(livro);
-      return "Livro emprestado com sucesso!";
+    // Controla reserva de hotel
+    public Hotel buscarReserva(int id) {
+      Hotel hotel = hotelDAO.buscar(id);
+      if(hotel.getReservaCliente() != null) {
+          return hotel;
+      } else {
+          return null;
+      }
     }
 
-    public String devolverLivro(int id) {
-      HotelDAO.devolver(id);
-      return "Livro devolvido com sucesso!";
+    public String reservarHotel(int id, String cliente, String dataInicio, String dataFim) {
+      Hotel hotel = hotelDAO.buscar(id);
+      hotel.setReservaCliente(cliente);
+      hotel.setReservaDataInicio(dataInicio);
+      hotel.setReservaDataFim(dataFim);
+      hotelDAO.atualizar(hotel);
+      return "Hotel reservado com sucesso!";
     }
 
-    public List<Hotel> listarLivrosEmprestados() {
-      return HotelDAO.listarEmprest();
+    public String cancelarReserva(int id) {
+      Hotel hotel = hotelDAO.buscar(id);
+      hotel.setReservaCliente(null);
+      hotel.setReservaDataInicio(null);
+      hotel.setReservaDataFim(null);
+      hotelDAO.atualizar(hotel);
+      return "Reserva cancelada com sucesso!";
     }
 
-
+    public List<Hotel> listarReservas() {
+      return hotelDAO.listarReservas();
+    }
 }
