@@ -17,6 +17,7 @@ public class DatabaseConfig {
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 
+
     public static void createTables() throws SQLException {
         try (Connection conexao = getConnection()) {
             DatabaseMetaData dbm = conexao.getMetaData();
