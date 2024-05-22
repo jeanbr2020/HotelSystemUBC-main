@@ -6,12 +6,12 @@ public interface IDAO<T> {
     // Controle de registro
     void cadastrar(T t);
     void atualizar(T t);
-    void excluir(int id);
-    T buscar(int id);
+    void excluir(Long id);
+    T buscar(Long id);
     List<T> listar();
     // Controle de reserva
     void reservar(T t);
-    void cancelarReserva(int id);
-    T buscarReserva(int id);
+    void cancelarReserva(Long id);
+    T buscarReserva(Long id);
     List<T> listarReservas();
 }

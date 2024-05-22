@@ -24,14 +24,14 @@ public class HotelDAO implements IDAO<Hotel> {
     }
 
     @Override
-    public void excluir(int id) {
-        hoteis.removeIf(hotel -> hotel.getId() == id);
+    public void excluir(Long id) {
+        hoteis.removeIf(hotel -> hotel.getId().equals(id));
     }
 
     @Override
-    public Hotel buscar(int id) {
+    public Hotel buscar(Long id) {
         for (Hotel hotel : hoteis) {
-            if (hotel.getId() == id) {
+            if (hotel.getId().equals(id)) {
                 return hotel;
             }
         }
@@ -49,7 +49,7 @@ public class HotelDAO implements IDAO<Hotel> {
     }
 
     @Override
-    public void cancelarReserva(int id) {
+    public void cancelarReserva(Long id) {
         Hotel hotel = buscar(id);
         if (hotel != null) {
             hotel.setReservaCliente(null);
@@ -60,7 +60,7 @@ public class HotelDAO implements IDAO<Hotel> {
     }
 
     @Override
-    public Hotel buscarReserva(int id) {
+    public Hotel buscarReserva(Long id) {
         Hotel hotel = buscar(id);
         if (hotel != null && hotel.getReservaCliente() != null) {
             return hotel;

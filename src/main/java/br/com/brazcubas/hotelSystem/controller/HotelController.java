@@ -20,18 +20,21 @@ public class HotelController {
       return "Cadastro realizado!";
     }
 
-    public String atualizarHotel(int id, String nome, String descricao, double preco) {
+    public String atualizarHotel(Long id, String nome, String descricao, double preco, String reservaCliente, String reservaDataInicio, String reservaDataFim) {
         Hotel hotel = new Hotel(id, nome, descricao, preco);
+        hotel.setReservaCliente(reservaCliente);
+        hotel.setReservaDataInicio(reservaDataInicio);
+        hotel.setReservaDataFim(reservaDataFim);
         hotelDAO.atualizar(hotel);
         return "Atualização realizada!";
     }
     
-    public String excluirHotel(int id) {
+    public String excluirHotel(Long id) {
       hotelDAO.excluir(id);
       return "Exclusão realizada!";
     }
   
-    public Hotel buscarHotel(int id) {
+    public Hotel buscarHotel(Long id) {
       return hotelDAO.buscar(id);
     }
     public List<Hotel> listarHoteis() {
@@ -39,7 +42,7 @@ public class HotelController {
     }
 
     // Controla reserva de hotel
-    public Hotel buscarReserva(int id) {
+    public Hotel buscarReserva(Long id) {
       Hotel hotel = hotelDAO.buscar(id);
       if(hotel.getReservaCliente() != null) {
           return hotel;
@@ -48,7 +51,7 @@ public class HotelController {
       }
     }
 
-    public String reservarHotel(int id, String cliente, String dataInicio, String dataFim) {
+    public String reservarHotel(Long id, String cliente, String dataInicio, String dataFim) {
       Hotel hotel = hotelDAO.buscar(id);
       hotel.setReservaCliente(cliente);
       hotel.setReservaDataInicio(dataInicio);
@@ -57,7 +60,7 @@ public class HotelController {
       return "Hotel reservado com sucesso!";
     }
 
-    public String cancelarReserva(int id) {
+    public String cancelarReserva(Long id) {
       Hotel hotel = hotelDAO.buscar(id);
       hotel.setReservaCliente(null);
       hotel.setReservaDataInicio(null);
