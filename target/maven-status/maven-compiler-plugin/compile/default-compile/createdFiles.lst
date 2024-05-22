@@ -1,0 +1,9 @@
+br\com\brazcubas\hotelSystem\controller\HotelController.class
+br\com\brazcubas\hotelSystem\config\DatabaseConfig.class
+br\com\brazcubas\hotelSystem\model\dao\IDAO.class
+br\com\brazcubas\hotelSystem\HotelSystem.class
+br\com\brazcubas\hotelSystem\view\HotelView.class
+br\com\brazcubas\hotelSystem\model\dao\HotelDAO.class
+br\com\brazcubas\hotelSystem\model\entity\Hotel.class
+br\com\brazcubas\hotelSystem\HotelSystemApplication.class
+br\com\brazcubas\hotelSystem\model\entity\AbstractEntity.class

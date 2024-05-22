@@ -1,8 +1,13 @@
 package br.com.brazcubas.hotelSystem.model.entity;
 
-public class AbstractEntity {
-    private int id;
+import javax.persistence.*;
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+@MappedSuperclass
+public abstract class AbstractEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 }
