@@ -1,9 +1,9 @@
 CREATE TABLE hotel (
-    id serial PRIMARY KEY,
-    nome varchar(100) NOT NULL,
-    descricao varchar(100) NOT NULL,
-    preco decimal NOT NULL,
-    reservaCliente varchar(100),
-    reservaDataInicio varchar(100),
-    reservaDataFim varchar(100)
+    id BIGINT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    descricao VARCHAR(255) NOT NULL,
+    preco DECIMAL(19, 2) NOT NULL,
+    reservaCliente VARCHAR(255),
+    reservaDataInicio VARCHAR(255),
+    reservaDataFim VARCHAR(255)
 );
