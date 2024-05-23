@@ -3,15 +3,22 @@ package br.com.brazcubas.hotelSystem;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import br.com.brazcubas.hotelSystem.controller.HotelController;
+import br.com.brazcubas.hotelSystem.view.HotelView;
 
 import br.com.brazcubas.hotelSystem.model.entity.Hotel;
 
 public class HotelSystem {
     private List<Hotel> hoteis;
-    private Scanner scanner = new Scanner(System.in);
+    private Scanner scanner;
+    public HotelController controller;
+    public HotelView view;
 
-    public HotelSystem() {
+    public HotelSystem(HotelController controller, HotelView view, Scanner scanner) {
         this.hoteis = new ArrayList<>();
+        this.controller = controller;
+        this.view = view;
+        this.scanner = scanner;
     }
 
     public void adicionarHotel(Hotel hotel) {
@@ -44,7 +51,7 @@ public class HotelSystem {
         do {
             mostrarMenu();
             opcao = scanner.nextLong();
-            switch(opcao.intValue()) {
+            switch (opcao.intValue()) {
                 case 1 -> adicionarHotel();
                 case 2 -> listarHoteis();
                 case 3 -> atualizarHotel();
@@ -55,7 +62,7 @@ public class HotelSystem {
                 case 0 -> System.out.println("Saindo do sistema...");
                 default -> System.out.println("Opção invalida.");
             }
-        } while(opcao != 0);
+        } while (opcao != 0);
     }
 
     private void mostrarMenu() {
@@ -73,6 +80,8 @@ public class HotelSystem {
         System.out.println("====================");
         System.out.println("Escolha uma opção: ");
     }
+
+
 
     private void adicionarHotel() {
         scanner.nextLine(); // Limpar buffer
