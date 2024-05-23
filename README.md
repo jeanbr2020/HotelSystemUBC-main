@@ -1,4 +1,4 @@
-# :hotel: Sistema de Hotel e Reservas
+# :hotel: Sistema de Hotel e Reservas- Em andamento
 
 <br>O Sistema de Gerenciamento de Reservas de Hotel será uma aplicação de linha de comando desenvolvida em Java e utilizará PostgreSQL para persistência de dados. O sistema será desenvolvido por grupos de alunos como parte de um trabalho interdisciplinar para as matérias de Programação Orientada a Objetos em Java e Banco de Dados com PostgreSQL</br>
 
