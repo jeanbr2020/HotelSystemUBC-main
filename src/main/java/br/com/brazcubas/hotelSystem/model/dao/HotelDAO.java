@@ -1,211 +1,198 @@
 package br.com.brazcubas.hotelSystem.model.dao;
 
+import org.springframework.stereotype.Repository;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import br.com.brazcubas.hotelSystem.config.DatabaseConfig;
 import br.com.brazcubas.hotelSystem.model.entity.Hotel;
-// Pra setar a data do emprestimo
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-// query
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.ResultSet;
+import br.com.brazcubas.hotelSystem.model.entity.Reserva;
 
+@Repository
 public class HotelDAO implements IDAO<Hotel> {
 
-    // >>>>> OPERAÇÕES NA TABELA LIVRO
     @Override
-    public void cadastrar(Hotel entidade) {
-        String sql = "INSERT INTO livro (titulo, autor, numPaginas) VALUES (?, ?, ?)";
+    public void cadastrar(Hotel hotel) throws SQLException {
+        String sql = "INSERT INTO hotel (nome, descricao, preco, hospede_id, reserva_cliente, reserva_nome_cliente, reserva_email_cliente, reserva_data_inicio, reserva_data_fim) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection connection = DatabaseConfig.getConnection();
-            PreparedStatement stmt = connection.prepareStatement(sql)) {
-                stmt.setString(1, entidade.getTitulo());
-                stmt.setString(2, entidade.getAutor());
-                stmt.setInt(3, entidade.getNumPaginas());
-                    // substituindo os placeholders (os ?, ?, ? do String sql) na consulta SQL pelos valores reais. Ou seja, stmt.setType(posicao_valor_nos_interrogacao, ação), que no caso estamos pegando atributos de entidade (que é nossa instancia)
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-                stmt.executeUpdate();
+            pstmt.setString(1, hotel.getNome());
+            pstmt.setString(2, hotel.getDescricao());
+            pstmt.setDouble(3, hotel.getPreco());
+            pstmt.setLong(4, hotel.getHospede().getId());
+            pstmt.setLong(5, hotel.getReserva().getCliente());
+            pstmt.setString(6, hotel.getReserva().getNomeCliente());
+            pstmt.setString(7, hotel.getReserva().getEmailCliente());
+            pstmt.setString(8, hotel.getReserva().getDataInicio());
+            pstmt.setString(9, hotel.getReserva().getDataFim());
+            pstmt.executeUpdate();
+
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 
     @Override
-    public void atualizar(Hotel entidade) {
-        String sql = "UPDATE livro SET titulo = ?, autor = ?, numPaginas = ? WHERE id = ?";
+    public void atualizar(Hotel hotel) throws SQLException {
+        String sql = "UPDATE hotel SET nome = ?, descricao = ?, preco = ?, hospede_id = ?, reserva_cliente = ?, reserva_nome_cliente = ?, reserva_email_cliente = ?, reserva_data_inicio = ?, reserva_data_fim = ? WHERE id = ?";
 
-        try (Connection connection = DatabaseConfig.getConnection();
-            PreparedStatement stmt = connection.prepareStatement(sql)) {
-                stmt.setString(1, entidade.getTitulo());
-                stmt.setString(2, entidade.getAutor());
-                stmt.setInt(3, entidade.getNumPaginas());
-                stmt.setInt(4, entidade.getId());
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-                stmt.executeUpdate();
+            pstmt.setString(1, hotel.getNome());
+            pstmt.setString(2, hotel.getDescricao());
+            pstmt.setDouble(3, hotel.getPreco());
+            pstmt.setLong(4, hotel.getHospede().getId());
+            pstmt.setLong(5, hotel.getReserva().getCliente());
+            pstmt.setString(6, hotel.getReserva().getNomeCliente());
+            pstmt.setString(7, hotel.getReserva().getEmailCliente());
+            pstmt.setString(8, hotel.getReserva().getDataInicio());
+            pstmt.setString(9, hotel.getReserva().getDataFim());
+            pstmt.setLong(10, hotel.getId());
+            pstmt.executeUpdate();
+
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 
+    // Restante do código...
     @Override
-    public void excluir(int id) {
-        String sql = "DELETE FROM livro WHERE id = ?";
-
-        try (Connection connection = DatabaseConfig.getConnection();
-            PreparedStatement stmt = connection.prepareStatement(sql)) {
-                stmt.setInt(1, id);
-
-                stmt.executeUpdate();
+    public void reservar(Long id, Long clienteId, String nomeCliente, String emailCliente, String dataInicio, String dataFim) {
+        String sql = "INSERT INTO reserva (idHospede, idHotel, dataInicio, dataFim) VALUES (?, ?, ?, ?)";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, clienteId);
+            pstmt.setLong(2, id);
+            pstmt.setString(3, dataInicio);
+            pstmt.setString(4, dataFim);
+            pstmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
-    }
-
-    @Override
-    public Hotel buscar(int id) {
-        String sql = "SELECT * FROM livro WHERE id = ?";
-
-        try (Connection connection = DatabaseConfig.getConnection();
-            PreparedStatement stmt = connection.prepareStatement(sql)) {
-                stmt.setInt(1, id);
-
-                ResultSet rs = stmt.executeQuery();
-
-                if(rs.next()) { // Ver observação 1
-                    String titulo = rs.getString("titulo");
-                    String autor = rs.getString("autor");
-                    int numPaginas = rs.getInt("numPaginas");
-                    Hotel livro = new Hotel(id, titulo, autor, numPaginas);
-                    return livro;
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        return null;
     }
 
     @Override
     public List<Hotel> listar() {
-        List<Hotel> livros = new ArrayList<Hotel>();
-        String sql = "SELECT * FROM livro";
-        
-        try (Connection connection = DatabaseConfig.getConnection();
-            PreparedStatement stmt = connection.prepareStatement(sql)) {
-
-                ResultSet rs = stmt.executeQuery();
-
-                while(rs.next()) {
-                    int id = rs.getInt("id");
-                    String titulo = rs.getString("titulo");
-                    String autor = rs.getString("autor");
-                    int numPaginas = rs.getInt("numPaginas");
-                    Hotel livro = new Hotel(id, titulo, autor, numPaginas);
-                    livros.add(livro);
-                }
-
-                return livros;
-            } catch (SQLException e) {
-                e.printStackTrace();
+        List<Hotel> hoteis = new ArrayList<>();
+        String sql = "SELECT * FROM hotel";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                // Aqui você pode adicionar cada hotel à lista
             }
-        return null;
-    }
-
-    // >>>>> OPERAÇÕES NA TABELA LIVROEMPRESTADO
-    @Override
-    public Hotel buscarEmpr(int id) {
-        String sql = "SELECT * FROM livroemprestado WHERE id_livro = ?";
-
-        try (Connection connection = DatabaseConfig.getConnection();
-            PreparedStatement stmt = connection.prepareStatement(sql)) {
-                stmt.setInt(1, id);
-
-                ResultSet rs = stmt.executeQuery();
-                if(rs.next()) {
-                    Hotel livro = buscar(id);
-                    livro.setEmprestimoMembro(rs.getString("membro"));
-                    livro.setEmprestimoResponsavel(rs.getString("funcionario"));
-                    livro.setDt_emprestimo(rs.getString("dt_emprest"));
-                    
-                    return livro;
-                }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
-        return null;
+        return hoteis;
     }
 
-
     @Override
-    public void emprestar(Hotel entidade) {
-        String sql = "INSERT INTO livroemprestado (membro, funcionario, dt_emprest, id_livro) VALUES (?, ?, ?, ?)";
-
-        try (Connection connection = DatabaseConfig.getConnection();
-            PreparedStatement stmt = connection.prepareStatement(sql)) {
-                // No momento estou controlando a data de empréstimo como String.
-                LocalDateTime agora = LocalDateTime.now();
-                DateTimeFormatter formatador = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                String dataFormatada = agora.format(formatador);
-
-                stmt.setString(1, entidade.getEmprestimoMembro());
-                stmt.setString(2, entidade.getEmprestimoResponsavel());
-                stmt.setString(3, dataFormatada);
-                stmt.setInt(4, entidade.getId());
-
-                stmt.executeUpdate();
-            } catch (SQLException e) {
-                e.printStackTrace();
+    public List<Reserva> listarReservas() {
+        List<Reserva> reservas = new ArrayList<>();
+        String sql = "SELECT * FROM reserva";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                // Aqui você pode adicionar cada reserva à lista
             }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return reservas;
     }
 
     @Override
-    public void devolver(int id_livro) {
-        String sql = "DELETE FROM livroemprestado WHERE id_livro = ?";
-
-        try (Connection connection = DatabaseConfig.getConnection();
-            PreparedStatement stmt = connection.prepareStatement(sql)) {
-                stmt.setInt(1, id_livro);
-
-                stmt.executeUpdate();
+    public Hotel buscar(Long id) {
+        Hotel hotel = null;
+        String sql = "SELECT * FROM hotel WHERE id = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, id);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    // Aqui você pode criar um novo objeto Hotel com os dados do ResultSet
+                }
+            }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
+        }
+        return hotel;
+    }
+
+    @Override
+    public Reserva buscarReserva(Long id) {
+        Reserva reserva = null;
+        String sql = "SELECT * FROM reserva WHERE id = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, id);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    // Aqui você pode criar um novo objeto Reserva com os dados do ResultSet
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return reserva;
+    }
+
+    @Override
+    public void excluir(Long id) {
+        String sql = "DELETE FROM hotel WHERE id = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, id);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
         }
     }
 
     @Override
-    public List<Hotel> listarEmprest() {
-        List<Hotel> livros = new ArrayList<Hotel>();
-        String sql = "SELECT * FROM livroemprestado";
-        
-        try (Connection connection = DatabaseConfig.getConnection();
-            PreparedStatement stmt = connection.prepareStatement(sql)) {
+    public void cancelarReserva(Long id, Long reservaId) {
+        String sql = "DELETE FROM reserva WHERE id = ? AND idHotel = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, reservaId);
+            pstmt.setLong(2, id);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 
-                ResultSet rs = stmt.executeQuery();
+    @Override
+    public void adicionarHospede(Long idHotel, Long idHospede) throws SQLException {
+      // TODO Auto-generated method stub
+      throw new UnsupportedOperationException("Unimplemented method 'adicionarHospede'");
+    }
 
-                while(rs.next()) {
-                    Hotel livro = buscar(rs.getInt("id_livro"));
-                    livros.add(livro);
-                }
+    @Override
+    public void removerHospede(Long idHotel) throws SQLException {
+      // TODO Auto-generated method stub
+      throw new UnsupportedOperationException("Unimplemented method 'removerHospede'");
+    }
 
-                return livros;
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        return null;
+    @Override
+    public Hotel buscarHospede(Long idHotel) throws SQLException {
+      // TODO Auto-generated method stub
+      throw new UnsupportedOperationException("Unimplemented method 'buscarHospede'");
+    }
+
+    @Override
+    public List<Hotel> listarHospedes() throws SQLException {
+      // TODO Auto-generated method stub
+      throw new UnsupportedOperationException("Unimplemented method 'listarHospedes'");
     }
 }
 
-/*
-OBSERVAÇÃO 1:
-O método rs.next() é usado para mover o cursor para a próxima linha nos resultados retornados pela consulta SQL.
-
-Quando uma consulta SQL é executada usando stmt.executeQuery(), um objeto ResultSet é retornado. Este objeto ResultSet representa uma tabela de dados, e inicialmente, o cursor está posicionado antes da primeira linha.
-
-Ao chamar rs.next(), o cursor se move para a próxima linha. Se essa linha existir, rs.next() retorna true. Se não houver mais linhas (ou seja, se o cursor estiver agora após a última linha), rs.next() retorna false.
-
-No seu caso, como você está buscando um livro por id, espera-se que no máximo um livro seja retornado. Portanto, você chama rs.next() uma vez para mover o cursor para a primeira (e única) linha retornada. Se um livro com o id fornecido for encontrado, rs.next() será true e você poderá recuperar os valores das colunas para esse livro. Se nenhum livro for encontrado, rs.next() será false e o método retornará null
-
- */

@@ -1,59 +1,70 @@
-package br.com.brazcubas.hotelSystem;.controller;
+package br.com.brazcubas.hotelSystem.controller;
 
-import java.util.List;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
-import br.com.brazcubas.hotelSystem.model.dao.IDAO;
-import br.com.brazcubas.hotelSystem.model.entity.Hotel;
+import org.springframework.stereotype.Controller;
 
+import br.com.brazcubas.hotelSystem.config.DatabaseConfig;
+import br.com.brazcubas.hotelSystem.model.dao.HotelDAO;
+
+@Controller
 public class HotelController {
-    private final IDAO<Hotel> HotelDAO;
+    public HotelDAO hotelDAO;
 
-    //>>>>>> CONSTRUTOR
-    public HotelController (IDAO<Hotel> HotelDAO) {
-      this.HotelDAO = HotelDAO;
+    // Construtor que aceita um objeto HotelDAO
+    public HotelController(HotelDAO hotelDAO) {
+        this.hotelDAO = hotelDAO;
     }
 
-    //>>>>>> CONTROLA CADASTRO LIVRO
-    public String cadastrarHospedes(Hotel livro) {
-      HotelDAO.cadastrar(livro);
-      return "Cadastro realizado!";
+    // Método para adicionar um novo hotel
+    public void addHotel(String nome, String descricao, double preco) {
+        String sql = "INSERT INTO hotel (nome, descricao, preco) VALUES (?, ?, ?)";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, nome);
+            pstmt.setString(2, descricao);
+            pstmt.setDouble(3, preco);
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
-    public String atualizarHospedes(Hotel livro) {
-        HotelDAO.atualizar(livro);
-        return "Atualização realizada!";
-      }
-    
-    public String excluirHospedes(int id) {
-      HotelDAO.excluir(id);
-      return "Exclusão realizada!";
-    }
-  
-    public Hotel buscarLivro(int id) {
-      return (Hotel) HotelDAO.buscar(id);
-    }
-    public List<Hotel> listarHospedes() {
-      return HotelDAO.listar();
+    // Método para atualizar um hotel existente
+    public void updateHotel(int id, String nome, String descricao, double preco) {
+        String sql = "UPDATE hotel SET nome = ?, descricao = ?, preco = ? WHERE id = ?";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, nome);
+            pstmt.setString(2, descricao);
+            pstmt.setDouble(3, preco);
+            pstmt.setInt(4, id);
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
-    //>>>>>> CONTROLA EMPRESTIMO LIVRO
-    public Hotel buscarLivroEmpr(int id) {
-      return (Hotel) HotelDAO.buscarEmpr(id);
+    // Método para deletar um hotel
+    public void deleteHotel(int id) {
+        String sql = "DELETE FROM hotel WHERE id = ?";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
     }
-
-    public String emprestaLivro(Hotel livro) {
-      HotelDAO.emprestar(livro);
-      return "Livro emprestado com sucesso!";
-    }
-
-    public String devolverLivro(int id) {
-      HotelDAO.devolver(id);
-      return "Livro devolvido com sucesso!";
-    }
-
-    public List<Hotel> listarLivrosEmprestados() {
-      return HotelDAO.listarEmprest();
-    }
-
-
 }

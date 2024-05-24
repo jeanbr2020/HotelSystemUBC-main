@@ -1,46 +1,70 @@
 package br.com.brazcubas.hotelSystem.model.entity;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "hotel")
 public class Hotel extends AbstractEntity {
-    private String titulo;
-    private String autor;
-    private int numPaginas;
-    
-    private String dt_emprestimo;
-    private String emprestimoMembro;
-    private String emprestimoResponsavel;
+    @Column(name = "nome", length = 255, nullable = false)
+    private String nome;
 
-// Construtorzin sem id
-// Usado para lançar dados no banco de dados caso este ainda não foi persistido. Por isso não temos ID
-public Hotel(String titulo, String autor, int numPaginas) {
-    this.titulo = titulo;
-        this.autor = autor;
-        this.numPaginas = numPaginas;
+    @Column(name = "descricao", length = 255, nullable = false)
+    private String descricao;
+
+    @Column(name = "preco", precision = 19, scale = 2, nullable = false)
+    private double preco;
+
+    // Novo campo para hospede
+    @OneToOne
+    @JoinColumn(name = "hospede_id")
+    private Hospede hospede;
+
+    // Novos campos para reserva
+    @OneToOne
+    @JoinColumn(name = "reserva_id")
+    private Reserva reserva;
+
+    // Construtor sem id
+    public Hotel(String nome, String descricao, double preco, Hospede hospede) {
+        this.nome = nome;
+        this.descricao = descricao;
+        this.preco = preco;
+        this.hospede = hospede;
     }
-    // Construtorzin com id
-    // Usado para caso o dado já persiste em BD, o ID, então, será usado para buscá-lo
-    public Hotel(int id, String titulo, String autor, int numPaginas) {
+
+    // Construtor com id
+    public Hotel(Long id, String nome, String descricao, double preco, Hospede hospede) {
         super.setId(id);
-        this.titulo = titulo;
-        this.autor = autor;
-        this.numPaginas = numPaginas;
+        this.nome = nome;
+        this.descricao = descricao;
+        this.preco = preco;
+        this.hospede = hospede;
     }
-    
-    // Getter n setters da massa
-    public String getTitulo() { return titulo; }
-    public void setTitulo(String titulo) {this.titulo = titulo; }
-    
-    public String getAutor() { return autor; }
-    public void setAutor(String autor) { this.autor = autor; }
-    
-    public int getNumPaginas() { return numPaginas; }
-    public void setNumPaginas(int numPaginas) { this.numPaginas = numPaginas; }
-    
-    public String getDt_emprestimo() { return dt_emprestimo;}
-    public void setDt_emprestimo(String dt_emprestimo) { this.dt_emprestimo = dt_emprestimo;}
 
-    public String getEmprestimoMembro() { return emprestimoMembro;}
-    public void setEmprestimoMembro(String emprestimoMembro) { this.emprestimoMembro = emprestimoMembro;}
+    // Getters e setters
+    // ...
 
-    public String getEmprestimoResponsavel() { return emprestimoResponsavel;}
-    public void setEmprestimoResponsavel(String emprestimoResponsavel) { this.emprestimoResponsavel = emprestimoResponsavel; }
+    // Getters e setters para hospede
+    public Hospede getHospede() { return this.hospede; }
+    public void setHospede(Hospede hospede) { this.hospede = hospede; }
+
+    // Getters e setters para reserva
+    public Reserva getReserva() { return this.reserva; }
+    public void setReserva(Reserva reserva) { this.reserva = reserva; }
+
+    // Métodos de reserva
+    public void reservar(Long cliente, String nomeCliente, String emailCliente, String dataInicio, String dataFim) {
+        Reserva reserva = new Reserva(cliente, nomeCliente, emailCliente, dataInicio, dataFim);
+        this.setReserva(reserva);
+    }
+
+    public void cancelarReserva(Long cliente) {
+        if (this.reserva != null && this.reserva.getCliente().equals(cliente)) {
+            this.setReserva(null);
+        }
+    }
 }
