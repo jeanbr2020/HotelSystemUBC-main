@@ -1,75 +1,70 @@
 package br.com.brazcubas.hotelSystem.controller;
 
-import java.util.List;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
-import br.com.brazcubas.hotelSystem.model.dao.IDAO;
-import br.com.brazcubas.hotelSystem.model.entity.Hotel;
+import org.springframework.stereotype.Controller;
 
+import br.com.brazcubas.hotelSystem.config.DatabaseConfig;
+import br.com.brazcubas.hotelSystem.model.dao.HotelDAO;
+
+@Controller
 public class HotelController {
-    private final IDAO<Hotel> hotelDAO;
+    public HotelDAO hotelDAO;
 
-    // Construtor
-    public HotelController (IDAO<Hotel> hotelDAO) {
-      this.hotelDAO = hotelDAO;
-    }
-
-    // Controla cadastro de hóspedes
-    public String cadastrarHotel(String nome, String descricao, double preco) {
-      Hotel hotel = new Hotel(nome, descricao, preco);
-      hotelDAO.cadastrar(hotel);
-      return "Cadastro realizado!";
+    // Construtor que aceita um objeto HotelDAO
+    public HotelController(HotelDAO hotelDAO) {
+        this.hotelDAO = hotelDAO;
     }
 
-    public String atualizarHotel(Long id, String nome, String descricao, double preco, String reservaCliente, String reservaDataInicio, String reservaDataFim) {
-        Hotel hotel = new Hotel(id, nome, descricao, preco);
-        hotel.setReservaCliente(reservaCliente);
-        hotel.setReservaDataInicio(reservaDataInicio);
-        hotel.setReservaDataFim(reservaDataFim);
-        hotelDAO.atualizar(hotel);
-        return "Atualização realizada!";
-    }
-    
-    public String excluirHotel(Long id) {
-      hotelDAO.excluir(id);
-      return "Exclusão realizada!";
-    }
-  
-    public Hotel buscarHotel(Long id) {
-      return hotelDAO.buscar(id);
-    }
-    public List<Hotel> listarHoteis() {
-      return hotelDAO.listar();
+    // Método para adicionar um novo hotel
+    public void addHotel(String nome, String descricao, double preco) {
+        String sql = "INSERT INTO hotel (nome, descricao, preco) VALUES (?, ?, ?)";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, nome);
+            pstmt.setString(2, descricao);
+            pstmt.setDouble(3, preco);
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
-    // Controla reserva de hotel
-    public Hotel buscarReserva(Long id) {
-      Hotel hotel = hotelDAO.buscar(id);
-      if(hotel.getReservaCliente() != null) {
-          return hotel;
-      } else {
-          return null;
-      }
+    // Método para atualizar um hotel existente
+    public void updateHotel(int id, String nome, String descricao, double preco) {
+        String sql = "UPDATE hotel SET nome = ?, descricao = ?, preco = ? WHERE id = ?";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, nome);
+            pstmt.setString(2, descricao);
+            pstmt.setDouble(3, preco);
+            pstmt.setInt(4, id);
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
-    public String reservarHotel(Long id, String cliente, String dataInicio, String dataFim) {
-      Hotel hotel = hotelDAO.buscar(id);
-      hotel.setReservaCliente(cliente);
-      hotel.setReservaDataInicio(dataInicio);
-      hotel.setReservaDataFim(dataFim);
-      hotelDAO.atualizar(hotel);
-      return "Hotel reservado com sucesso!";
-    }
+    // Método para deletar um hotel
+    public void deleteHotel(int id) {
+        String sql = "DELETE FROM hotel WHERE id = ?";
 
-    public String cancelarReserva(Long id) {
-      Hotel hotel = hotelDAO.buscar(id);
-      hotel.setReservaCliente(null);
-      hotel.setReservaDataInicio(null);
-      hotel.setReservaDataFim(null);
-      hotelDAO.atualizar(hotel);
-      return "Reserva cancelada com sucesso!";
-    }
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-    public List<Hotel> listarReservas() {
-      return hotelDAO.listarReservas();
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
     }
 }

@@ -3,7 +3,7 @@ package br.com.brazcubas.hotelSystem.model.dao;
 import java.sql.SQLException;
 import java.util.List;
 
-public interface IDAO<T> {
+public interface HotelsDAO<T> {
     // Controle de registro
     void cadastrar(T t) throws SQLException;
     void atualizar(T t) throws SQLException;
@@ -16,10 +16,4 @@ public interface IDAO<T> {
     void removerHospede(Long idHotel) throws SQLException;
     T buscarHospede(Long idHotel) throws SQLException;
     List<T> listarHospedes() throws SQLException;
-
-    // Controle de reserva
-    void reservar(Long idHotel, Long idCliente, String nomeCliente, String emailCliente, String dataInicio, String dataFim) throws SQLException;
-    void cancelarReserva(Long idHotel, Long idCliente) throws SQLException;
-    T buscarReserva(Long id) throws SQLException;
-    List<T> listarReservas() throws SQLException;
 }

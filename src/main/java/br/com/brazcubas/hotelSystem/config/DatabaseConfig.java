@@ -17,7 +17,6 @@ public class DatabaseConfig {
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 
-
     public static void createTables() throws SQLException {
         try (Connection conexao = getConnection()) {
             DatabaseMetaData dbm = conexao.getMetaData();
@@ -36,6 +35,22 @@ public class DatabaseConfig {
                             ");";
                 Statement statement = conexao.createStatement();
                 statement.execute(sqlHotel);
+            }
+
+            // Snipet de validação existencia tabela reserva
+            ResultSet tablesReserva = dbm.getTables(null, null, "reserva", null); // getTables(catalog, schemaPattern, tableNamePattern, types)
+            if (!tablesReserva.next()) {
+                String sqlReserva =
+                            "CREATE TABLE reserva (" +
+                                "id serial PRIMARY KEY," +
+                                "idHospede bigint NOT NULL," +
+                                "idHotel bigint NOT NULL," +
+                                "idTipoQuarto bigint NOT NULL," +
+                                "dataInicio varchar(100) NOT NULL," +
+                                "dataFim varchar(100) NOT NULL" +
+                            ");";
+                Statement statement = conexao.createStatement();
+                statement.execute(sqlReserva);
             }
         } catch (SQLException e) {
             e.printStackTrace();
